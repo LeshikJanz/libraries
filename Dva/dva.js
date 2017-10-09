@@ -13018,6 +13018,9 @@ function create() {
     var onError = function onError(err) {
       if (err) {
         if (typeof err === 'string') err = new Error(err);
+        err.preventDefault = function () {
+          err._dontReject = true;
+        };
         plugin.apply('onError', function (err) {
           throw new Error(err.stack || err);
         })(err, app._store.dispatch);
@@ -16058,7 +16061,7 @@ exports.default = function (_ref) {
     devtools = _window2.default.__REDUX_DEVTOOLS_EXTENSION__;
   }
 
-  var enhancers = [_redux.applyMiddleware.apply(undefined, (0, _toConsumableArray3.default)(middlewares)), devtools()].concat((0, _toConsumableArray3.default)(extraEnhancers));
+  var enhancers = [_redux.applyMiddleware.apply(undefined, (0, _toConsumableArray3.default)(middlewares)), devtools(_window2.default.__REDUX_DEVTOOLS_EXTENSION__OPTIONS)].concat((0, _toConsumableArray3.default)(extraEnhancers));
 
   return (0, _redux.createStore)(reducers, initialState, _redux.compose.apply(undefined, (0, _toConsumableArray3.default)(enhancers)));
 };
@@ -16411,7 +16414,9 @@ function getWatcher(resolve, reject, key, _effect, model, onError, onEffect) {
             _context4.t0 = _context4['catch'](0);
 
             onError(_context4.t0);
-            reject(key, _context4.t0);
+            if (!_context4.t0._dontReject) {
+              reject(key, _context4.t0);
+            }
 
           case 16:
           case 'end':
